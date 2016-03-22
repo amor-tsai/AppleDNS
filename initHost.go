@@ -38,7 +38,7 @@ func main() {
 		isp := json.Get("data").Get("isp").MustString()
 		isp = region + isp
 
-		dnsFile := "./AppleDNS/List.md"
+		dnsFile := "./List.md"
 		fd, err3 := os.Open(dnsFile)
 		if nil != err3 {
 			panic(err3)

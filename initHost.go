@@ -20,7 +20,7 @@ func main() {
 	hostContent := ""
 	domain := ""
 	var hkIp string
-	ip, err1 := GetLocalPublicIp()
+	ip, err1 := getLocalPublicIp()
 	if err1 != nil {
 		fmt.Println(err1.Error())
 	} else {
@@ -88,7 +88,30 @@ func httpGet(url string) ([]byte, error) {
 	return body, err
 }
 
-func GetLocalPublicIp() (string, error) {
+/**
+获取ip地址所属的地区及isp
+返回例如: 广东 电信 or 北京 联通
+**/
+func getRegionAndIsp(ip string) (string, string, error) {
+	resp, err := httpGet("http://ip.taobao.com/service/getIpInfo.php?ip=" + ip)
+	if nil != err {
+		panic(err)
+	}
+	// fmt.Println(resp)
+	json, err2 := simplejson.NewJson(resp)
+	if nil != err2 {
+		panic(err2)
+	}
+	region := json.Get("data").Get("region").MustString()
+	region = strings.TrimRight(region, "省")
+	isp := json.Get("data").Get("isp").MustString()
+	return region, isp, nil
+}
+
+/**
+获取本机ip
+**/
+func getLocalPublicIp() (string, error) {
 	timeout := time.Nanosecond * 30
 	conn, err := net.DialTimeout("tcp", "ns1.dnspod.net:6666", timeout*time.Second)
 	defer func() {
